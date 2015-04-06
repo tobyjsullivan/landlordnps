@@ -1,0 +1,63 @@
+@landlordnps("Browse Ratings") {
+    <p>These are all the ratings we have for landlords around Vancouver.</p>
+<!--<iframe width="600" height="450" frameborder="0" style="border:0"-->
+        <!--src="https://www.google.com/maps/embed/v1/view?zoom=11&center=49.2827,-123.1207&key=AIzaSyC3b-xoLEpC3Pcp5zvvPl8EdRsQ_vjIYjo"></iframe>-->
+<div id="map-canvas" style="height: 450px; width: 600px;"></div>
+    <div class="ratings">
+        <div class="rating">
+            <p><u>1434 Burnaby St, Vancouver</u></p>
+            <p>Landlord: Hollyburn Holdings Corp <strong>-32</strong></p>
+            <p>Manager: ??? <strong>-12</strong></p>
+        </div>
+        <div class="rating">
+            <p><u>1009 W 10th Ave, Vancouver</u></p>
+            <p>Landlord: Vallejo Court </p>
+            <p><strong>Rating: -2</strong></p>
+        </div>
+    </div>
+    <p><strong>#TODO</strong></p>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3b-xoLEpC3Pcp5zvvPl8EdRsQ_vjIYjo&libraries=places"></script>
+    <script language="JavaScript">
+        function initialize() {
+            var geocoder = new google.maps.Geocoder();
+            var myLatlng = new google.maps.LatLng(49.2827,-123.1207);
+            var mapOptions = {
+              zoom: 11,
+              center: myLatlng
+            }
+            var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+            markPlaceId('ChIJCXMtHCxyhlQRA7NJwYaFCGg', map);
+            markPlaceId('Ei4xMDA5IFcgMTB0aCBBdmUsIFZhbmNvdXZlciwgQkMgVjZIIDFIOSwgQ2FuYWRh', map);
+        }
+
+        function createMarker(place, map) {
+            var marker = new google.maps.Marker({
+                map: map,
+                position: place.geometry.location
+            });
+
+        }
+
+        function markPlaceId(placeId, map) {
+            var request = {
+              placeId: placeId
+            };
+
+            function callback(place, status) {
+              if (status == google.maps.places.PlacesServiceStatus.OK) {
+                createMarker(place, map);
+                // alert('Place: '+JSON.stringify(place));
+              } else {
+                alert('Error getting place: ' + status)
+              }
+            }
+
+            service = new google.maps.places.PlacesService(map);
+            service.getDetails(request, callback);
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+}

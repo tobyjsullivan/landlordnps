@@ -1,0 +1,85 @@
+@landlordnps("Rate a Landlord") {
+    <p>Tell us about the landlord you would like to rate.</p>
+    <p>
+        Address: <input type="text" id="rate-address" name="rate-address" style="width: 400px;"><br>
+        <small>Don't include your apartment or suite # if possible.</small>
+    </p>
+    <p>Landlord: <input type="text" id="rate-landlord-name" style="width: 400px;" placeholder="Landlord's name"><br>
+        <small>First name only or company name please!</small></p>
+    <p>How likely is it that you would recommend this landlord to a friend?<br>
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-0" value="0"> 0 (Never)
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-1" value="1"> 1
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-2" value="2"> 2
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-3" value="3"> 3
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-4" value="4"> 4
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-5" value="5"> 5
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-6" value="6"> 6
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-7" value="7"> 7
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-8" value="8"> 8
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-9" value="9"> 9
+        <input type="radio" name="rate-landlord-value" id="rate-landlord-value-10" value="10"> 10 (Definitely)</p>
+    <p><input type="button" value="Submit Rating!" onclick="javascript:submitRating(onRatingSubmitComplete);"></p>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script language="JavaScript">
+        var input = document.getElementById('rate-address');
+        var options = {
+          types: ['address']
+        };
+
+        autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    </script>
+    <script language="JavaScript">
+        function submitRating(callback) {
+          var place = autocomplete.getPlace();
+          var addressField = document.getElementById('rate-address');
+          var landlordNameField = document.getElementById('rate-landlord-name');
+          var landlordRatingField = document.getElementById('rate-landlord-value');
+
+          if (place === undefined || place.id === undefined) {
+            alert('We could not find that address. Please try again.');
+            return false;
+          }
+          var placeId = place.place_id;
+
+          var radios = document.getElementsByName('rate-landlord-value');
+
+          var landlordRating = null;
+          for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+              // do whatever you want with the checked radio
+              landlordRating = radios[i].value;
+
+              // only one radio can be logically checked, don't check the rest
+              break;
+            }
+          }
+          if (landlordRating === null) {
+            alert('Please choose a rating value');
+            return false;
+          }
+
+          // Submit rating
+          var url = '/api/rate';
+          var rateObj = {
+            placeId: placeId,
+            landlordName: landlordNameField.value,
+            rating: landlordRating
+          };
+          $.ajax(url, {
+            method: 'post',
+            data: JSON.stringify(rateObj),
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json"
+          })
+            .done(callback);
+
+          return true;
+        }
+
+        function onRatingSubmitComplete() {
+          alert('Rating submitted!');
+        }
+    </script>
+}
